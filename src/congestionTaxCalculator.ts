@@ -21,16 +21,20 @@ function getTax(vehicle: Vehicle, dates: Date[]): number {
         let diffInMillies = date.getTime() - intervalStart.getTime();
         let minutes = diffInMillies/1000/60;
 
+        // Check if the current date is within 60 minutes from the interval start
         if (minutes <= 60) {
-            if (totalFee > 0) totalFee -= tempFee;
-            if (nextFee >= tempFee) tempFee = nextFee;
-            totalFee += tempFee;
+            // If within the same interval, only increase if the next fee is higher
+            if (nextFee > tempFee) {
+                totalFee += nextFee - tempFee;
+            }
         } else {
+            // If a new interval starts, add the next fee and update the interval start
             totalFee += nextFee;
+            intervalStart = date; // Update the interval start to the current date
         }
 
+        // Cap the total fee at 60 SEK per day
         if (totalFee > 60) totalFee = 60;
-        return totalFee;
     }
 
     return 0;
@@ -55,12 +59,15 @@ function getTollFee(date: Date, vechicle: Vehicle): number {
     const minute:number = date.getMinutes();
 
     if (hour == 6 && minute >= 0 && minute <= 29) return 8;
+    }
+    // Return the total fee after processing all dates
+    return totalFee;
     else if (hour == 6 && minute >= 30 && minute <= 59) return 13;
     else if (hour == 7 && minute >= 0 && minute <= 59) return 18;
     else if (hour == 8 && minute >= 0 && minute <= 29) return 13;
     else if (hour >= 8 && hour <= 14 && minute >= 30 && minute <= 59) return 8;
     else if (hour == 15 && minute >= 0 && minute <= 29) return 13;
-    else if (hour == 15 && minute >= 0 || hour == 16 && minute <= 59) return 18;
+    else if ((hour == 15 && minute >= 0 && minute <= 29) || (hour == 16 && minute <= 59)) return 18;
     else if (hour == 17 && minute >= 0 && minute <= 59) return 13;
     else if (hour == 18 && minute >= 0 && minute <= 29) return 8;
     else return 0;
@@ -69,7 +76,7 @@ function getTollFee(date: Date, vechicle: Vehicle): number {
 function isTollFreeDate(date: Date): boolean {
     const year:number = date.getFullYear();
     const month:number = date.getMonth() + 1;
-    const day:number = date.getDay() + 1;
+    const day:number = date.getDay();
     const dayOfMonth:number = date.getDate();
 
     if (day == 6 || day == 0) return true;
