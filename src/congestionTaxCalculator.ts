@@ -76,7 +76,7 @@ function getTollFee(date: Date, vechicle: Vehicle): number {
 function isTollFreeDate(date: Date): boolean {
     const year:number = date.getFullYear();
     const month:number = date.getMonth() + 1;
-    const day:number = date.getDay() + 1;
+    const day:number = date.getDay();
     const dayOfMonth:number = date.getDate();
 
     if (day == 6 || day == 0) return true;
